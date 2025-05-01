@@ -1,0 +1,56 @@
+<launch>
+    <!-- Flag to start recoding a rosbag  -->
+    <arg name="record" default="false"/>
+    <!-- Initial position and heading of the vehicle (wrt Gazebo's inertial frame)  -->
+    <arg name="x" default="0"/>
+    <arg name="y" default="0"/>
+    <arg name="z" default="5"/>
+    <arg name="yaw" default="0"/>
+    <arg name="use_ned_frame" default="false"/>
+    <arg name="joy_dev" default="/dev/input/js0" doc="Device Name of Joystick"/>
+    <arg name="gazebo" default="true" doc="Enable Gazebo for Camera Visualization (no physics)"/>
+
+    <!-- Initialize the Gazebo world  -->
+    <include file="$(find uuv_gazebo_worlds)/launch/ocean_waves.launch"/>   
+
+    <!-- Add the BlueROV2 vehicle to the world  -->
+    <!-- <include file="$(find bluerov2_description)/launch/upload.launch"> -->
+    <include file="$(find bluerov2_description)/launch/upload.launch">
+        <arg name="x" default="$(arg x)"/>
+        <arg name="y" default="$(arg y)"/>
+        <arg name="z" default="$(arg z)"/>
+        <arg name="yaw" default="$(arg yaw)"/>
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/>
+    </include>
+
+    <!-- Start the PID controller with its default parameters for the bluerov2 vehicle  -->
+    <!-- Flag: Added PID controller into the sitl -->
+    <!-- <include file="$(find bluerov2_control)/launch/rov_pid_controller.launch"> 
+        <arg name="uuv_name" value="bluerov2"/> 
+        <arg name="model_name" value="bluerov2"/> 
+        <arg name="use_ned_frame" value="$(arg use_ned_frame)"/> 
+    </include>   -->
+
+    <!-- Start the SITL (Pixhawk controller) with its default parameters for the BlueROV2 vehicle  -->
+    <include file="$(find bluerov2_control)/launch/start_ardusub_sitl.launch">
+        <arg name="joy_dev" value="$(arg joy_dev)"/>
+        <arg name="pose2gazebo" value="$(arg gazebo)"/>
+        <!--<arg name="use_joystick" value="$(arg use_joystick)"/>-->
+    </include>
+
+    <!-- Optional: Start Foxglove Bridge -->
+    <node pkg="foxglove_bridge" type="foxglove_bridge" name="foxglove_bridge" output="screen" />
+
+    <!-- Start Joystick to MAVROS RC Override -->
+    <!-- <node pkg="bluerov2_control" type="sky_joy_to_mavros.py" name="joy_to_mavros" output="screen"/> -->
+    <!-- Optional: Add toggle button to run some trajectories -->
+    <!-- <node pkg="bluerov2_control" type="sky_joy_toggle.py" name="joy_to_mavros" output="screen"/>  -->
+
+
+    <!-- Start RViz  -->
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find bluerov2_control)/rviz/bluerov2_control.rviz"/>
+
+     <include file="$(find bluerov2_control)/launch/start_thruster_manager.launch">
+    </include>
+    
+</launch>

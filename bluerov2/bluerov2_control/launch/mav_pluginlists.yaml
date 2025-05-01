@@ -1,0 +1,28 @@
+plugins:
+  setpoint_velocity:
+    enabled: true
+  sys_status:
+    enabled: true
+  connection:
+    enabled: true
+    
+plugin_blacklist:
+# common
+- 3dr_radio
+- actuator_control
+- ftp
+- global_position
+- safety_area
+- setpoint_attitude
+- sys_time
+# extras
+- image_pub
+- 'mocap_*'
+- px4flow
+- 'vision_*'
+- distance_sensor
+- vibration
+- altitude
+
+plugin_whitelist: []
+#- 'sys_*'

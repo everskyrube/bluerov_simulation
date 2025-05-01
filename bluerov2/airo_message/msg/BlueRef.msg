@@ -1,0 +1,3 @@
+geometry_msgs/Point ref_pos
+geometry_msgs/Point ref_ang
+geometry_msgs/Twist ref_twist
